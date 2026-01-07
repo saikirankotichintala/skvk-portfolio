@@ -32,7 +32,7 @@ function Hero() {
             </a>
 
             <a
-              href="/Saikiran_Resume.pdf"
+              href="/Saikiran_Kotichintala_Resume.pdf"
               download
               className="secondary"
             >
