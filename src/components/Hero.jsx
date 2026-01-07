@@ -1,4 +1,4 @@
-import "../styles/hero.css";
+import "../styles/Hero.css";
 import gmail from "../assets/socials/gmail.png";
 import github from "../assets/socials/github.png";
 import linkedin from "../assets/socials/linkedin.png";
