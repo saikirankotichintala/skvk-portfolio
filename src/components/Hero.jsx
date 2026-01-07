@@ -23,7 +23,7 @@ function Hero() {
 
           <div className="hero-buttons">
             <a
-              href="/Saikiran_Resume.pdf"
+              href="/Saikiran_Kotichintala_Resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="primary"
