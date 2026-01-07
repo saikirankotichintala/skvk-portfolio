@@ -1,9 +1,10 @@
+import Skills from "./components/Skills";
+import About from "./components/About";
+import Contact from "./components/Contact";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
-import Skills from "./components/Skills";
 import Projects from "./components/Projects";
-import About from "./components/about";
-import Contact from "./components/contact";
+
 function App() {
   return (
     <>
