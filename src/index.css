@@ -1,0 +1,52 @@
+/* ===============================
+   GLOBAL RESET
+================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===============================
+   HTML & BODY
+================================ */
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-color: #f4f4f4; /* ✅ neutral background */
+  color: #0f0909;
+}
+
+/* ===============================
+   LINKS
+================================ */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ===============================
+   BUTTON RESET
+================================ */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+/* ===============================
+   LIST RESET
+================================ */
+ul {
+  list-style-type: disc;
+}

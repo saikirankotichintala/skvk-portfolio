@@ -1,0 +1,79 @@
+/* ===============================
+   CONTACT SECTION
+================================ */
+.contact-section {
+  width: 100%;
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 80px 60px;
+  background: #ffffff;
+  border-radius: 24px;
+  text-align: center;
+}
+
+/* ===============================
+   CONTACT CARD
+================================ */
+.contact-card {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 60px 70px;
+
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+
+  text-align: center;
+}
+
+/* ===============================
+   CONTACT TITLE
+================================ */
+.contact-card h2 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #111;
+}
+
+/* ===============================
+   CONTACT TEXT
+================================ */
+.contact-text {
+  font-size: 16px;
+  color: #444;
+  margin-bottom: 30px;
+}
+
+/* ===============================
+   CONTACT LINKS
+================================ */
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.contact-links a {
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.contact-links a:hover {
+  color: #7a5cff;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+  .contact-card {
+    padding: 40px 30px;
+    margin: 0 20px;
+  }
+
+  .contact-card h2 {
+    font-size: 28px;
+  }
+}

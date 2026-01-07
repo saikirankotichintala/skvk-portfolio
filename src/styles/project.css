@@ -1,0 +1,135 @@
+/* ===============================
+   PROJECTS SECTION
+================================ */
+.projects {
+  width: 100%;
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 80px 60px;
+
+  background: #ffffff;
+  border-radius: 24px;
+  text-align: center;
+}
+
+/* ===============================
+   SECTION HEADING
+================================ */
+.projects h2 {
+  font-size: 36px;
+  margin-bottom: 50px;
+  color: #222;
+}
+
+/* ===============================
+   PROJECT GRID
+================================ */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+}
+
+/* ===============================
+   PROJECT CARD
+================================ */
+.project-card {
+  background: #f5f5ff;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: left;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* ===============================
+   PROJECT TITLE
+================================ */
+.project-card h3 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: #222;
+}
+
+/* ===============================
+   TECH / SKILLS TAGS
+================================ */
+.project-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.project-tech span {
+  background: #ece9ff;
+  color: #7a5cff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+/* ===============================
+   BULLET POINTS
+================================ */
+.project-card ul {
+  padding-left: 18px;
+  margin-bottom: 20px;
+}
+
+.project-card li {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+/* ===============================
+   PROJECT LINKS
+================================ */
+.project-links {
+  margin-top: 20px;
+}
+
+.project-links a {
+  display: inline-block;
+  background: #7a5cff;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 20px;
+
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.project-links a:hover {
+  background: #a855f7;
+  transform: translateY(-2px);
+}
+
+/* ===============================
+   HOVER POLISH
+================================ */
+.project-card:hover .project-tech span {
+  background: #e0dcff;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 768px) {
+  .projects {
+    padding: 60px 30px;
+  }
+}

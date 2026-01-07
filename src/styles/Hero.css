@@ -1,0 +1,166 @@
+/* ===============================
+   HERO WRAPPER (The Grey Background)
+================================ */
+.hero-wrapper {
+  width: 100%;
+  background: #f4f4f4;
+
+  display: flex;
+  justify-content: center; /* Centers card horizontally */
+  align-items: flex-start; /* Starts card from the top (not middle) */
+  
+  /* --- 🔧 ADJUST THESE TO FIX THE OUTER GAP --- */
+  padding-top: 120px;      /* Small gap at the top (near navbar) */
+  padding-bottom: 15px;  /* Large gap at the bottom (Enlarged) */
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* ===============================
+   HERO CARD (The White Box)
+================================ */
+.hero {
+  width: 100%;
+  max-width: 1400px;
+  
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 60px;
+
+  /* --- 🔧 ADJUST THESE TO FIX THE INNER CARD GAP --- */
+  padding-top: 50px;      /* Standard space inside top of card */
+  padding-bottom: 100px;  /* Extra space inside bottom of card */
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+/* ===============================
+   TEXT & CONTENT
+================================ */
+.hero-text {
+  flex: 1;
+  max-width: 600px;
+}
+
+.hero-text h1 {
+  font-size: 52px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #111;
+  line-height: 1.2;
+}
+
+.hero-text h1 span {
+  color: #7a5cff;
+}
+
+.hero-text h2 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 600;
+}
+
+.hero-text p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+/* BUTTONS */
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-buttons .primary {
+  background: linear-gradient(90deg, #7a5cff, #a855f7);
+  color: #ffffff;
+  padding: 14px 34px;
+  border-radius: 30px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.hero-buttons .secondary {
+  background: #111111;
+  color: #ffffff;
+  padding: 14px 34px;
+  border-radius: 30px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.hero-buttons a:hover {
+  transform: translateY(-3px);
+}
+
+/* ===============================
+   IMAGE & SOCIALS
+================================ */
+.hero-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.hero-image .main-pic {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid #f2f1f5;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.hero-socials {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.hero-socials img {
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.hero-socials img:hover {
+  transform: scale(1.1);
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column-reverse;
+    text-align: center;
+    padding: 50px 30px; /* Equal padding on mobile usually looks better */
+    gap: 40px;
+  }
+
+  .hero-text {
+    max-width: 100%;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+  }
+
+  .hero-image .main-pic {
+    width: 240px;
+    height: 240px;
+  }
+}
