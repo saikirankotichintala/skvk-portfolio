@@ -25,11 +25,11 @@ function Contact() {
           </a>
 
           <a
-            href="https://linkedin.com/in/saikirankotichintala"
+            href="https://www.linkedin.com/in/saikirankotichintalala/"
             target="_blank"
             rel="noreferrer"
           >
-            🔗 linkedin.com/in/saikirankotichintala
+            🔗 linkedin.com/in/saikirankotichintala/
           </a>
         </div>
       </div>
