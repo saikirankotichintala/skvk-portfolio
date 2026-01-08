@@ -50,3 +50,74 @@ button {
 ul {
   list-style-type: disc;
 }
+/* ===== Footer ===== */
+.footer {
+  background: #0f172a; /* dark navy */
+  color: #e5e7eb;
+  padding: 50px 20px 30px;
+  margin-top: 80px;
+}
+
+.footer-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-container h3 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #f8fafc;
+}
+
+.footer-container p {
+  font-size: 14px;
+  color: #cbd5f5;
+  margin-bottom: 20px;
+}
+
+/* Links */
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  color: #38bdf8;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #7dd3fc;
+  transform: translateY(-2px);
+}
+
+/* Copyright */
+.footer-copy {
+  font-size: 12px;
+  color: #94a3b8;
+  border-top: 1px solid #1e293b;
+  padding-top: 15px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 480px) {
+  .footer-container h3 {
+    font-size: 20px;
+  }
+
+  .footer-links {
+    gap: 16px;
+  }
+
+  .footer-links a {
+    font-size: 14px;
+  }
+}
