@@ -1,36 +1,53 @@
 import "../styles/contact.css";
 
 function Contact() {
+  const contacts = [
+    {
+      label: "Email",
+      value: "saikirankotichintala@gmail.com",
+      href: "mailto:saikirankotichintala@gmail.com",
+    },
+    {
+      label: "GitHub",
+      value: "github.com/saikirankotichintala",
+      href: "https://github.com/saikirankotichintala",
+    },
+    {
+      label: "LinkedIn",
+      value: "linkedin.com/in/saikirankotichintala",
+      href: "https://www.linkedin.com/in/saikirankotichintala/",
+    },
+  ];
+
   return (
-    <section className="contact-section" id="contact">
+    <section className="section-shell contact-section" id="contact">
       <div className="contact-card">
-        <h2>Contact</h2>
+        <div className="section-heading section-heading-left">
+          <p>Contact</p>
+          <h2>Open to internships, projects, and meaningful collaborations.</h2>
+        </div>
 
         <p className="contact-text">
-          I’m open to internship opportunities, collaborations, and learning
-          discussions. Feel free to reach out.
+          If you are looking for an intern who can contribute with discipline,
+          curiosity, and strong fundamentals, feel free to reach out.
         </p>
 
+        <a className="contact-primary" href="mailto:saikirankotichintala@gmail.com">
+          Start a conversation
+        </a>
+
         <div className="contact-links">
-          <a href="mailto:saikirankotichintala@gmail.com">
-            📧 saikirankotichintala@gmail.com
-          </a>
-
-          <a
-            href="https://github.com/saikirankotichintala"
-            target="_blank"
-            rel="noreferrer"
-          >
-            💻 github.com/saikirankotichintala
-          </a>
-
-          <a
-            href="https://www.linkedin.com/in/saikirankotichintalala/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            🔗 linkedin.com/in/saikirankotichintala/
-          </a>
+          {contacts.map((item) => (
+            <a
+              key={item.label}
+              href={item.href}
+              target={item.href.startsWith("http") ? "_blank" : undefined}
+              rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+            >
+              <span>{item.label}</span>
+              <strong>{item.value}</strong>
+            </a>
+          ))}
         </div>
       </div>
     </section>
@@ -38,5 +55,3 @@ function Contact() {
 }
 
 export default Contact;
-/* ===============================
-   CONTACT SECTION  // =============================== */

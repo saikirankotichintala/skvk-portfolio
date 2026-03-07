@@ -4,21 +4,22 @@ import github from "../assets/socials/github.png";
 import linkedin from "../assets/socials/linkedin.png";
 
 function Hero() {
-  return (
-    <section className="hero-wrapper" id="home">
-      
-      {/* 1. Added the flex container class 'hero' */}
-      <div className="hero"> 
+  const stats = [
+    { value: "8+", label: "Projects built" },
+    { value: "3", label: "Core domains" },
+    { value: "2026", label: "Internship ready" },
+  ];
 
-        {/* --- LEFT SIDE: TEXT --- */}
+  return (
+    <section className="section-shell hero-wrapper" id="home">
+      <div className="hero">
         <div className="hero-text">
-          <h1>
-            Hi, I’m <span>Saikiran Kotichintala</span>
-          </h1>
-          <h2>CSE (AI & Data Science) Student</h2>
+          <p className="hero-kicker">AI AND DATA SCIENCE STUDENT</p>
+          <h1>Building practical software with Python, analytics, and React.</h1>
           <p>
-            I build beginner-friendly Python and Data Analytics projects
-            and I am learning to become an AI Engineer.
+            I am Saikiran Kotichintala, a Computer Science undergraduate focused
+            on AI and Data Science. I design clean, reliable projects that solve
+            real business and data problems.
           </p>
 
           <div className="hero-buttons">
@@ -30,48 +31,56 @@ function Hero() {
             >
               View Resume
             </a>
-
-            <a
-              href="/Saikiran_Kotichintala_Resume.pdf"
-              download
-              className="secondary"
-            >
-              Download Resume
+            <a href="#projects" className="secondary">
+              Explore Projects
             </a>
+          </div>
+
+          <div className="hero-stats">
+            {stats.map((item) => (
+              <div className="hero-stat" key={item.label}>
+                <strong>{item.value}</strong>
+                <span>{item.label}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* --- RIGHT SIDE: IMAGE & SOCIALS --- */}
         <div className="hero-image">
-          {/* 2. Added specific class 'main-pic' to match CSS */}
-          <img src="/profile.png" alt="profile" className="main-pic" />
+          <div className="main-pic-wrap">
+            <img
+              src="/profile.png"
+              alt="Portrait of Saikiran Kotichintala"
+              className="main-pic"
+            />
+          </div>
 
-          {/* 3. Moved Socials INSIDE hero-image so they sit below the photo */}
           <div className="hero-socials">
-            <a href="mailto:saikirankotichintala@gmail.com">
+            <a
+              href="mailto:saikirankotichintala@gmail.com"
+              aria-label="Send email"
+            >
               <img src={gmail} alt="Email" />
             </a>
-
             <a
               href="https://github.com/saikirankotichintala"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Visit GitHub profile"
             >
               <img src={github} alt="GitHub" />
             </a>
-
             <a
-              href="https://www.linkedin.com/in/saikirankotichintalala/"
+              href="https://www.linkedin.com/in/saikirankotichintala/"
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Visit LinkedIn profile"
             >
               <img src={linkedin} alt="LinkedIn" />
             </a>
           </div>
         </div>
-      
-      </div> {/* End of .hero */}
-
+      </div>
     </section>
   );
 }

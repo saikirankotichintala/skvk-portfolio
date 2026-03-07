@@ -4,73 +4,77 @@ function Projects() {
   const projects = [
     {
       title: "Grocery Shop Management System",
+      summary:
+        "A Python and MySQL solution for handling product, customer, and worker records through a structured console workflow.",
       tech: ["Python", "MySQL"],
       points: [
-        "Developed a console-based grocery shop management system using Python and MySQL.",
-        "Implemented CRUD operations to manage customer, product, and worker records.",
-        "Designed a relational database schema and integrated it with Python.",
-        "Strengthened understanding of SQL queries and database connectivity."
+        "Implemented CRUD operations for operational records.",
+        "Designed a normalized relational schema and query patterns.",
+        "Integrated Python logic with persistent database storage.",
       ],
-      link: "https://github.com/saikirankotichintala/GROCERY_STORE_MANAGEMENT"
+      link: "https://github.com/saikirankotichintala/GROCERY_STORE_MANAGEMENT",
     },
     {
       title: "Grocery Sales Analytics Dashboard",
+      summary:
+        "An interactive analytics dashboard that helps track trends, category performance, and product-level behavior.",
       tech: ["Python", "Dash"],
       points: [
-        "Built an interactive dashboard to visualize grocery sales data.",
-        "Created dynamic charts and filters to analyze sales trends and product performance.",
-        "Processed and cleaned data to ensure accurate visual insights.",
-        "Improved skills in data analysis and dashboard development."
+        "Built dynamic filters and visual components for decision support.",
+        "Cleaned and transformed source data for reliable reporting.",
+        "Communicated insights through focused visual storytelling.",
       ],
-      link: "https://github.com/saikirankotichintala/grocery-store-sales-analysis"
+      link: "https://github.com/saikirankotichintala/grocery-store-sales-analysis",
     },
     {
       title: "BPE Tokenizer",
+      summary:
+        "A from-scratch Byte Pair Encoding tokenizer project to understand text preprocessing and NLP tokenization mechanics.",
       tech: ["Python", "NLP"],
       points: [
-        "Implemented a Byte Pair Encoding (BPE) tokenizer from scratch using Python.",
-        "Developed encoding and decoding logic for text preprocessing.",
-        "Gained hands-on experience with basic NLP concepts and tokenization.",
-        "Enhanced understanding of text processing techniques used in language models."
+        "Implemented merge operations and vocabulary building logic.",
+        "Created encoding and decoding pipelines for sample corpora.",
+        "Improved understanding of foundational language model tooling.",
       ],
-      link: "https://github.com/saikirankotichintala/bpe_tokenizer"
-    }
+      link: "https://github.com/saikirankotichintala/bpe_tokenizer",
+    },
   ];
 
   return (
-    <section className="projects" id="projects">
-      <h2>Projects</h2>
+    <section className="section-shell projects" id="projects">
+      <div className="section-heading">
+        <p>Projects</p>
+        <h2>Selected work that demonstrates execution from idea to delivery.</h2>
+      </div>
 
       <div className="projects-grid">
         {projects.map((project, index) => (
-          <div className="project-card" key={index}>
+          <article
+            className="project-card"
+            style={{ "--project-delay": `${index * 90}ms` }}
+            key={project.title}
+          >
             <h3>{project.title}</h3>
+            <p className="project-summary">{project.summary}</p>
 
-            {/* TECH / SKILLS TAGS */}
             <div className="project-tech">
-              {project.tech.map((t, i) => (
-                <span key={i}>{t}</span>
+              {project.tech.map((item) => (
+                <span key={item}>{item}</span>
               ))}
             </div>
 
-            {/* BULLET POINTS */}
             <ul>
-              {project.points.map((point, i) => (
-                <li key={i}>{point}</li>
+              {project.points.map((point) => (
+                <li key={point}>{point}</li>
               ))}
             </ul>
 
-            {/* PROJECT LINK */}
             <div className="project-links">
-              <a
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View on GitHub →
+              <a href={project.link} target="_blank" rel="noopener noreferrer">
+                View Repository
               </a>
             </div>
-          </div>
+          </article>
         ))}
       </div>
     </section>
