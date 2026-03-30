@@ -27,16 +27,16 @@ function Projects() {
       link: "https://github.com/saikirankotichintala/grocery-store-sales-analysis",
     },
     {
-      title: "BPE Tokenizer",
+      title: "NGO Impact Management System",
       summary:
-        "A from-scratch Byte Pair Encoding tokenizer project to understand text preprocessing and NLP tokenization mechanics.",
-      tech: ["Python", "NLP"],
+        "A full-stack platform designed to help NGOs manage donors, volunteers, and social-impact reporting efficiently.",
+      tech: ["React", "Node.js", "MongoDB"],
       points: [
-        "Implemented merge operations and vocabulary building logic.",
-        "Created encoding and decoding pipelines for sample corpora.",
-        "Improved understanding of foundational language model tooling.",
+        "Built donor and volunteer workflows to streamline community outreach.",
+        "Implemented impact dashboards for transparent reporting and decision-making.",
+        "Integrated secure data management for beneficiary and project tracking.",
       ],
-      link: "https://github.com/saikirankotichintala/bpe_tokenizer",
+      link: "https://github.com/saikirankotichintala/ngo_qrcode_scanner",
     },
   ];
 

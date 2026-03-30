@@ -18,9 +18,9 @@ function About() {
           </p>
           <p>
             Through projects like a grocery management platform, a sales
-            dashboard, and a tokenizer implementation, I have developed strong
-            fundamentals in problem solving, data modeling, and iterative
-            product development.
+            dashboard, and an NGO impact management system, I have developed
+            strong fundamentals in problem solving, data modeling, and
+            iterative product development.
           </p>
           <p>
             I am currently seeking internship opportunities where I can
