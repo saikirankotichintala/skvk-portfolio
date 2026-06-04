@@ -15,7 +15,7 @@ const EXPERIENCES = [
     highlights: [
       "Software Development: Built digital solutions supporting artisan initiatives including QR-code-driven profile access.",
       "QR Architecture: Developed functionality for users to scan QR codes and access detailed artisan profiles seamlessly.",
-      "Patent Protection: Engineered a fingerprint-based offline authenticity verification system, upgrading the base prototype to secure a filed provisional patent application.",
+      "Security: Engineered a fingerprint-based offline authenticity verification system to protect artisan product integrity.",
     ],
     logo: "🌱",
     color: "#16a34a",
@@ -49,19 +49,13 @@ const EDUCATION = [
     degree: "Secondary School (10th)",
     period: "July 2022",
     icon: "🏫",
-    color: "#ea580c",
+    color: "var(--color-orange)" as string,
     note: "Completed",
   },
 ];
 
 // ─── Achievements Data ────────────────────────────────────
 const ACHIEVEMENTS = [
-  {
-    title: "Provisional Patent Filed",
-    desc: "Successfully filed an official application for an Offline Authenticity Verification System for Handmade Products.",
-    icon: "📜",
-    color: "#0066ff",
-  },
   {
     title: "NGO Recognition Award",
     desc: "Awarded a formal Contribution Certificate by the Amarswarup Foundation for impactful full-stack software development contributions.",
@@ -238,7 +232,7 @@ export function ExperienceSection() {
               style={{ maxWidth: "360px" }}
             >
               Hands-on experience building real products that serve real people —
-              from NGO-backed software to a patent-filed verification system.
+              from NGO-backed software to AI-integrated full-stack systems.
             </motion.p>
           </div>
 

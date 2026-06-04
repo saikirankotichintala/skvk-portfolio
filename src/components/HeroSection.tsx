@@ -32,7 +32,7 @@ function useTypingAnimation(words: string[], loop = true) {
         setDisplayed(next);
         if (next === "") {
           setIsDeleting(false);
-          if (loop) setWordIndex((i) => (i + 1) % words.length);
+          if (loop) setWordIndex((i: number) => (i + 1) % words.length);
         }
       }
     }, typeSpeed);
@@ -126,10 +126,11 @@ function WordReveal({
   );
 }
 
-/* ── Main Hero Component ─────────────────────────────────── */
+/* ── Main Hero Component ─────────────────────────────────────── */
 export function HeroSection() {
-  const heroRef = useRef<HTMLElement>(null);
+  const heroRef  = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
   const typedText = useTypingAnimation([
     "Machine Learning",
     "Data Pipelines",
@@ -138,11 +139,30 @@ export function HeroSection() {
     "Predictive Models",
   ]);
 
+  /* Always-dark color tokens */
+  const c = {
+    heading1:    "#f5f0e8",
+    heading2:    "rgba(245,240,232,0.80)",
+    via:         "rgba(255,200,80,0.70)",
+    typed:       "linear-gradient(135deg, #ff8c00 0%, #ffd000 100%)",
+    cursor:      "#ff8c00",
+    solutions:   "rgba(255,200,80,0.45)",
+    subtext:     "rgba(245,240,232,0.75)",
+    subtextName: "#ffb300",
+    subtextRole: "#ff8c00",
+    divider:     "rgba(255,140,0,0.25)",
+    statNum:     "#ffd000",
+    statLabel:   "rgba(255,200,80,0.55)",
+    scrollText:  "rgba(255,180,0,0.50)",
+    scrollLine:  "linear-gradient(to bottom, rgba(255,140,0,0.5), transparent)",
+    fadeBg:      "#0d0d0d",
+  };
+
   useEffect(() => {
     // Ensure video plays on load
     const video = videoRef.current;
     if (video) {
-      video.play().catch(() => {});
+      video.play().catch(() => { });
     }
   }, []);
 
@@ -150,7 +170,7 @@ export function HeroSection() {
     const ctx = gsap.context(() => {
       // Subtle parallax on the video as you scroll
       gsap.to(".hero-video-bg", {
-        yPercent: 30,
+        yPercent: 15,
         ease: "none",
         scrollTrigger: {
           trigger: heroRef.current,
@@ -170,8 +190,19 @@ export function HeroSection() {
       id="hero"
       aria-label="Hero section"
     >
-      {/* ── Video background ─────────────────────────────── */}
-      <div className="hero-video-bg">
+      {/* ── Video background — oversized to absorb parallax ─ */}
+      <div
+        className="hero-video-bg"
+        style={{
+          background: "#0a0a0f",
+          top: "-15%",
+          bottom: "-15%",
+          left: 0,
+          right: 0,
+          height: "130%",
+          position: "absolute",
+        }}
+      >
         <video
           ref={videoRef}
           autoPlay
@@ -190,13 +221,13 @@ export function HeroSection() {
         </video>
       </div>
 
-      {/* ── Dark overlay for text legibility ─────────────── */}
+      {/* ── Dark overlay for text legibility ───────────────── */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(135deg, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.45) 60%, rgba(0,0,0,0.30) 100%)",
+            "linear-gradient(to bottom, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.72) 40%, rgba(0,0,0,0.60) 100%)",
           zIndex: 1,
         }}
         aria-hidden="true"
@@ -240,14 +271,26 @@ export function HeroSection() {
       >
         <div style={{ maxWidth: "800px" }}>
 
-          {/* Availability badge — liquid glass */}
+          {/* Availability badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             style={{ marginBottom: "2.25rem" }}
           >
-            <div className="lg-badge-dark">
+            <div style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              padding: "0.4rem 1rem",
+              borderRadius: "100px",
+              background: "rgba(255, 140, 0, 0.10)",
+              border: "1px solid rgba(255, 140, 0, 0.30)",
+              fontSize: "0.78rem",
+              fontWeight: 500,
+              color: "#ffb300",
+              letterSpacing: "0.03em",
+            }}>
               <span className="availability-dot" />
               Open to opportunities &amp; collaborations
             </div>
@@ -255,16 +298,16 @@ export function HeroSection() {
 
           {/* Headline — line 1: letter reveal */}
           <div style={{ marginBottom: "0.2rem", overflow: "hidden" }}>
-            <h1 className="text-display" style={{ color: "#ffffff" }}>
+            <h1 className="text-display" style={{ color: c.heading1 }}>
               <LetterReveal
                 text="Building"
-                color="#ffffff"
+                color={c.heading1}
                 delay={0.3}
               />
               {" "}
               <LetterReveal
                 text="intelligent"
-                color="rgba(255,255,255,0.85)"
+                color={c.heading2}
                 delay={0.65}
               />
             </h1>
@@ -280,14 +323,14 @@ export function HeroSection() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.7, delay: 1.1 }}
-                style={{ color: "rgba(255,255,255,0.6)" }}
+                style={{ color: c.via }}
               >
                 via
               </motion.span>
               {/* Typed word */}
               <span
                 style={{
-                  background: "linear-gradient(135deg, #60a5fa 0%, #a78bfa 100%)",
+                  background: c.typed,
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   backgroundClip: "text",
@@ -304,7 +347,7 @@ export function HeroSection() {
                     display: "inline-block",
                     width: "3px",
                     height: "0.85em",
-                    background: "#60a5fa",
+                    background: c.cursor,
                     marginLeft: "3px",
                     verticalAlign: "middle",
                     borderRadius: "2px",
@@ -321,7 +364,7 @@ export function HeroSection() {
               <WordReveal
                 text="solutions."
                 delay={1.0}
-                style={{ color: "rgba(255,255,255,0.45)" }}
+                style={{ color: c.solutions }}
               />
             </h1>
           </div>
@@ -334,44 +377,96 @@ export function HeroSection() {
             style={{
               fontSize: "clamp(1rem, 1.5vw, 1.2rem)",
               lineHeight: 1.75,
-              color: "rgba(255,255,255,0.7)",
+              color: c.subtext,
               maxWidth: "560px",
               marginBottom: "2.5rem",
             }}
           >
             Hi, I&apos;m{" "}
-            <strong style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600 }}>
+            <strong style={{ color: c.subtextName, fontWeight: 600 }}>
               Saikiran Kotichintala
-            </strong>{" "}—{" "}
-            <span style={{ color: "rgba(255,255,255,0.85)" }}>
-              AI &amp; Machine Learning Enthusiast
-            </span>
+            </strong>{" "}&mdash;{" "}
+            <span style={{ color: c.subtextRole }}>AI &amp; Machine Learning Enthusiast</span>
             {" · "}
-            <span style={{ color: "rgba(255,255,255,0.85)" }}>Data Analyst</span>
+            <span style={{ color: c.subtextRole }}>Data Analyst</span>
             {" · "}
-            <span style={{ color: "rgba(255,255,255,0.85)" }}>Full-Stack Developer</span>
+            <span style={{ color: c.subtextRole }}>Full-Stack Developer</span>
             . B.Tech CS (AI &amp; DS) at{" "}
-            <strong style={{ color: "rgba(255,255,255,0.95)", fontWeight: 600 }}>
-              Ramdeobaba University
-            </strong>
+            <strong style={{ color: c.subtextName, fontWeight: 600 }}>Ramdeobaba University</strong>
             , Nagpur.
           </motion.p>
 
-          {/* CTA Buttons — liquid glass */}
+          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 1.6, ease: [0.16, 1, 0.3, 1] }}
             style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}
           >
-            <a href="#projects" className="lg-btn">
+            <a
+              href="#projects"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.875rem 2rem",
+                borderRadius: "100px",
+                background: "linear-gradient(135deg, #ff8c00, #ffb300)",
+                color: "#0d0d0d",
+                fontWeight: 600,
+                fontSize: "0.9rem",
+                textDecoration: "none",
+                boxShadow: "0 4px 20px rgba(255,140,0,0.40)",
+                transition: "all 0.25s ease",
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget;
+                el.style.background = "linear-gradient(135deg, #ffb300, #ffd000)";
+                el.style.boxShadow = "0 8px 32px rgba(255,140,0,0.60)";
+                el.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget;
+                el.style.background = "linear-gradient(135deg, #ff8c00, #ffb300)";
+                el.style.boxShadow = "0 4px 20px rgba(255,140,0,0.40)";
+                el.style.transform = "translateY(0)";
+              }}
+            >
               View my work
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="3" y1="8" x2="13" y2="8" />
                 <polyline points="9,4 13,8 9,12" />
               </svg>
             </a>
-            <a href="#contact" className="lg-btn lg-btn-ghost">
+            <a
+              href="#contact"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                padding: "0.875rem 2rem",
+                borderRadius: "100px",
+                background: "rgba(255,140,0,0.08)",
+                color: "#ff8c00",
+                fontWeight: 500,
+                fontSize: "0.9rem",
+                textDecoration: "none",
+                border: "1px solid rgba(255,140,0,0.35)",
+                transition: "all 0.25s ease",
+              }}
+              onMouseEnter={(e) => {
+                const el = e.currentTarget;
+                el.style.background = "rgba(255,140,0,0.18)";
+                el.style.color = "#ffd000";
+                el.style.borderColor = "rgba(255,140,0,0.6)";
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget;
+                el.style.background = "rgba(255,140,0,0.08)";
+                el.style.color = "#ff8c00";
+                el.style.borderColor = "rgba(255,140,0,0.35)";
+              }}
+            >
               Get in touch
             </a>
           </motion.div>
@@ -386,13 +481,13 @@ export function HeroSection() {
               gap: "2.5rem",
               marginTop: "5rem",
               paddingTop: "2.5rem",
-              borderTop: "1px solid rgba(255,255,255,0.12)",
+              borderTop: `1px solid ${c.divider}`,
               flexWrap: "wrap",
             }}
           >
             {[
-              { num: "2+", label: "Projects shipped" },
-              { num: "1",  label: "Patent filed" },
+              { num: "8+", label: "Projects shipped" },
+              { num: "4+", label: "Certifications" },
               { num: "AI/DS", label: "Specialization" },
             ].map((m) => (
               <div key={m.label}>
@@ -401,7 +496,7 @@ export function HeroSection() {
                     fontSize: "1.75rem",
                     fontWeight: 700,
                     letterSpacing: "-0.04em",
-                    color: "#ffffff",
+                    color: c.statNum,
                   }}
                 >
                   {m.num}
@@ -409,7 +504,7 @@ export function HeroSection() {
                 <div
                   style={{
                     fontSize: "0.8rem",
-                    color: "rgba(255,255,255,0.5)",
+                    color: c.statLabel,
                     marginTop: "2px",
                     letterSpacing: "0.02em",
                   }}
@@ -422,7 +517,7 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* ── Scroll indicator ─────────────────────────────── */}
+      {/* ── Scroll indicator ─────────────────────────────────────── */}
       <div
         style={{
           position: "absolute",
@@ -441,7 +536,7 @@ export function HeroSection() {
           style={{
             fontSize: "0.65rem",
             letterSpacing: "0.15em",
-            color: "rgba(255,255,255,0.4)",
+            color: c.scrollText,
             textTransform: "uppercase",
           }}
         >
@@ -453,12 +548,12 @@ export function HeroSection() {
           style={{
             width: "1px",
             height: "44px",
-            background: "linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)",
+            background: c.scrollLine,
           }}
         />
       </div>
 
-      {/* ── Bottom gradient fade into next section ────────── */}
+      {/* ── Bottom gradient fade into next section ──────────────── */}
       <div
         aria-hidden="true"
         style={{
@@ -467,7 +562,7 @@ export function HeroSection() {
           left: 0,
           right: 0,
           height: "180px",
-          background: "linear-gradient(to bottom, transparent, #ffffff)",
+          background: `linear-gradient(to bottom, transparent, ${c.fadeBg})`,
           zIndex: 5,
           pointerEvents: "none",
         }}

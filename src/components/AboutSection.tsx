@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
+import { PhotoCard } from "./PhotoCard";
 
 interface CountUpProps {
   target: number;
@@ -41,22 +42,16 @@ function CountUp({ target, suffix = "", prefix = "", duration = 2000 }: CountUpP
 
 const STATS = [
   {
-    value: 2,
+    value: 8,
     suffix: "+",
     label: "Projects Delivered",
     desc: "End-to-end ML and full-stack applications shipped to production",
   },
   {
-    value: 1,
-    suffix: "",
-    label: "Patent Filed",
-    desc: "Provisional patent for an Offline Authenticity Verification System",
-  },
-  {
-    value: 2,
-    suffix: "",
+    value: 4,
+    suffix: "+",
     label: "Certifications",
-    desc: "Google Cloud Computing Foundations & Deloitte Data Analytics",
+    desc: "Google Cloud, Deloitte Data Analytics & more",
   },
   {
     value: 1,
@@ -156,8 +151,7 @@ export function AboutSection() {
               <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
                 Python, SQL, Pandas, and Scikit-learn
               </strong>
-              . I have a filed provisional patent and practical experience developing data-driven
-              software solutions for an NGO initiative.
+              and practical experience developing data-driven software solutions for an NGO initiative.
             </motion.p>
 
             <motion.p
@@ -213,109 +207,9 @@ export function AboutSection() {
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
             style={{ position: "relative" }}
           >
-            {/* Profile image placeholder */}
-            <div
-              style={{
-                width: "100%",
-                maxWidth: "420px",
-                aspectRatio: "4/5",
-                borderRadius: "24px",
-                overflow: "hidden",
-                position: "relative",
-                background: "linear-gradient(135deg, #e0e7ff 0%, #ede9fe 50%, #dbeafe 100%)",
-              }}
-            >
-              {/* Avatar placeholder */}
-              <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexDirection: "column",
-                  gap: "1rem",
-                }}
-              >
-                <div
-                  style={{
-                    width: "90px",
-                    height: "90px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, #6366f1, #60a5fa)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "2.5rem",
-                    color: "white",
-                    fontWeight: 700,
-                  }}
-                >
-                  SK
-                </div>
-                <div
-                  style={{
-                    width: "120px",
-                    height: "8px",
-                    borderRadius: "4px",
-                    background: "rgba(0,0,0,0.08)",
-                  }}
-                />
-                <div
-                  style={{
-                    width: "80px",
-                    height: "8px",
-                    borderRadius: "4px",
-                    background: "rgba(0,0,0,0.05)",
-                  }}
-                />
-              </div>
+            {/* Real photo card */}
+            <PhotoCard />
 
-              {/* Corner label */}
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "1.5rem",
-                  left: "1.5rem",
-                  background: "rgba(255,255,255,0.92)",
-                  backdropFilter: "blur(10px)",
-                  borderRadius: "12px",
-                  padding: "0.75rem 1rem",
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-                }}
-              >
-                <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>
-                  Saikiran Kotichintala
-                </div>
-                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                  B.Tech CS (AI &amp; DS) · RBU Nagpur
-                </div>
-              </div>
-            </div>
-
-            {/* Floating badge — Patent */}
-            <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              style={{
-                position: "absolute",
-                top: "2rem",
-                right: "-1.5rem",
-                background: "white",
-                borderRadius: "14px",
-                padding: "0.875rem 1.125rem",
-                boxShadow: "0 8px 40px rgba(0,0,0,0.1)",
-                border: "1px solid var(--border)",
-              }}
-            >
-              <div style={{ fontSize: "1.25rem", marginBottom: "2px" }}>📜</div>
-              <div style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-primary)" }}>
-                Patent
-              </div>
-              <div style={{ fontSize: "0.65rem", color: "var(--text-muted)" }}>
-                Filed
-              </div>
-            </motion.div>
 
             {/* Floating badge — AI */}
             <motion.div

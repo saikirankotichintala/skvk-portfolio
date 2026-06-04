@@ -1,9 +1,24 @@
 "use client";
 
 import { useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
-const PROJECTS = [
+interface Project {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  tags: string[];
+  metrics: string[];
+  highlights: string[];
+  color: string;
+  accentColor: string;
+  github: string;
+  featured: boolean;
+  video?: string;
+}
+
+const PROJECTS: Project[] = [
   {
     id: 1,
     title: "Flight Price Prediction System",
@@ -17,10 +32,11 @@ const PROJECTS = [
       "Applied feature engineering on departure time, airline, and route data",
       "Evaluated multiple regression models to maximize accuracy",
     ],
-    color: "#f0f4ff",
-    accentColor: "#0066ff",
+    color: "rgba(255, 140, 0, 0.03)",
+    accentColor: "#ff8c00",
     github: "https://github.com/saikirankotichintala",
     featured: true,
+    video: "/sorry.mp4",
   },
   {
     id: 2,
@@ -29,26 +45,90 @@ const PROJECTS = [
     description:
       "Engineered a full-stack web application using a React and JavaScript frontend alongside a Python Flask backend. Provides QR-code-driven access to artisan profiles with AI-generated stories. Integrated Groq API and LLaMA 3 to dynamically generate engaging digital stories about artisan heritages, enhancing supply chain transparency.",
     tags: ["React", "JavaScript", "Python", "Flask", "Groq API", "LLaMA 3", "MongoDB", "Git"],
-    metrics: ["AI story generation", "QR code access", "Patent-grade security"],
+    metrics: ["AI story generation", "QR code access", "Offline verification"],
     highlights: [
       "Integrated Groq API (LLaMA 3) for real-time AI story generation about artisans",
       "Built QR-code-driven access system for artisan profile discovery",
-      "Engineered fingerprint-based offline authenticity verification — led to a filed provisional patent",
+      "Engineered fingerprint-based offline authenticity verification for product integrity",
     ],
-    color: "#f0fdf4",
-    accentColor: "#16a34a",
+    color: "rgba(255, 208, 0, 0.03)",
+    accentColor: "#ffd000",
     github: "https://github.com/saikirankotichintala",
     featured: true,
   },
 ];
 
-function ProjectVisual({ project }: { project: typeof PROJECTS[0] }) {
+function ProjectVisual({ project }: { project: Project }) {
+  if (project.video) {
+    return (
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          background: "#000",
+          overflow: "hidden",
+        }}
+      >
+        <video
+          src={project.video}
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+        {/* Dark overlay gradients for a high-end look and readable badge */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 15%, transparent 85%, rgba(0,0,0,0.5) 100%)",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Inner shadow to separate from content */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            boxShadow: "inset 0 0 40px rgba(0,0,0,0.8)",
+            pointerEvents: "none",
+          }}
+        />
+        {/* Accent badge */}
+        <div
+          style={{
+            position: "absolute",
+            top: "1.25rem",
+            right: "1.25rem",
+            background: project.accentColor,
+            color: "#0d0d0d",
+            borderRadius: "8px",
+            padding: "0.3rem 0.6rem",
+            fontSize: "0.65rem",
+            fontWeight: 700,
+            letterSpacing: "0.06em",
+            textTransform: "uppercase",
+            zIndex: 10,
+          }}
+        >
+          Live
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
         width: "100%",
         height: "100%",
-        minHeight: "300px",
         background: project.color,
         position: "relative",
         overflow: "hidden",
@@ -62,11 +142,12 @@ function ProjectVisual({ project }: { project: typeof PROJECTS[0] }) {
       <div
         style={{
           width: "90%",
-          maxWidth: "420px",
-          background: "white",
+          maxWidth: "450px",
+          background: "var(--surface)",
           borderRadius: "12px",
-          boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
+          boxShadow: "0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 140, 0, 0.05)",
           overflow: "hidden",
+          border: "1px solid var(--border)",
         }}
       >
         {/* Browser bar */}
@@ -76,14 +157,14 @@ function ProjectVisual({ project }: { project: typeof PROJECTS[0] }) {
             alignItems: "center",
             gap: "0.4rem",
             padding: "0.625rem 0.875rem",
-            background: "#f9fafb",
-            borderBottom: "1px solid #f3f4f6",
+            background: "rgba(0, 0, 0, 0.3)",
+            borderBottom: "1px solid var(--border)",
           }}
         >
           <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#fca5a5" }} />
           <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#fcd34d" }} />
           <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#86efac" }} />
-          <div style={{ flex: 1, height: "12px", background: "#e5e7eb", borderRadius: "4px", marginLeft: "0.5rem" }} />
+          <div style={{ flex: 1, height: "12px", background: "rgba(255, 255, 255, 0.05)", borderRadius: "4px", marginLeft: "0.5rem" }} />
         </div>
 
         {/* Content area */}
@@ -100,8 +181,8 @@ function ProjectVisual({ project }: { project: typeof PROJECTS[0] }) {
               }}
             />
             <div style={{ flex: 1 }}>
-              <div style={{ height: "8px", width: "60%", background: "#e5e7eb", borderRadius: "4px", marginBottom: "4px" }} />
-              <div style={{ height: "6px", width: "40%", background: "#f3f4f6", borderRadius: "4px" }} />
+              <div style={{ height: "8px", width: "60%", background: "rgba(255, 255, 255, 0.1)", borderRadius: "4px", marginBottom: "4px" }} />
+              <div style={{ height: "6px", width: "40%", background: "rgba(255, 255, 255, 0.05)", borderRadius: "4px" }} />
             </div>
           </div>
 
@@ -124,7 +205,7 @@ function ProjectVisual({ project }: { project: typeof PROJECTS[0] }) {
                 style={{
                   flex: 1,
                   height: `${h}%`,
-                  background: `${project.accentColor}${i % 2 === 0 ? "60" : "30"}`,
+                  background: `${project.accentColor}${i % 2 === 0 ? "80" : "40"}`,
                   borderRadius: "3px 3px 0 0",
                 }}
               />
@@ -138,8 +219,8 @@ function ProjectVisual({ project }: { project: typeof PROJECTS[0] }) {
                 key={i}
                 style={{
                   height: "28px",
-                  background: i === 0 ? `${project.accentColor}15` : "#f9fafb",
-                  border: i === 0 ? `1px solid ${project.accentColor}25` : "1px solid #f3f4f6",
+                  background: i === 0 ? `${project.accentColor}15` : "rgba(255, 255, 255, 0.03)",
+                  border: i === 0 ? `1px solid ${project.accentColor}25` : "1px solid rgba(255, 255, 255, 0.05)",
                   borderRadius: "6px",
                 }}
               />
@@ -155,11 +236,11 @@ function ProjectVisual({ project }: { project: typeof PROJECTS[0] }) {
           top: "1.25rem",
           right: "1.25rem",
           background: project.accentColor,
-          color: "white",
+          color: "#0d0d0d",
           borderRadius: "8px",
           padding: "0.3rem 0.6rem",
           fontSize: "0.65rem",
-          fontWeight: 600,
+          fontWeight: 700,
           letterSpacing: "0.06em",
           textTransform: "uppercase",
         }}
@@ -170,16 +251,46 @@ function ProjectVisual({ project }: { project: typeof PROJECTS[0] }) {
   );
 }
 
+function ZoomCard({ children }: { children: React.ReactNode }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"],
+  });
+
+  const scale   = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0,   1,    1,    1.5]);
+  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0,   1,    1,    0]);
+  const blur    = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [80,  0,    0,    48]);
+  const filter  = useTransform(blur, (b) => `blur(${b}px)`);
+
+  return (
+    <div ref={containerRef} className="project-card-runway">
+      <motion.div
+        className="project-card-sticky"
+        style={{
+          scale,
+          opacity,
+          filter,
+        }}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+
 export function ProjectsSection() {
   return (
     <section
       id="projects"
       className="section"
-      style={{ background: "var(--surface)" }}
+      style={{ background: "var(--surface)", padding: 0 }}
       aria-label="Projects"
     >
-      <div className="container">
-        {/* Header */}
+      {/* Section header — inside a container */}
+      <div className="container" style={{ paddingTop: "var(--section-padding)" }}>
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -221,144 +332,177 @@ export function ProjectsSection() {
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.1 }}
           >
             End-to-end builds spanning machine learning pipelines, AI integrations,
-            and full-stack web applications — one of which led to a filed patent.
+            and full-stack web applications built for real-world impact.
           </motion.p>
         </div>
+      </div>
 
-        {/* Featured projects */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
-          {PROJECTS.map((project, idx) => (
-            <motion.div
-              key={project.id}
-              className="project-card"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{
-                duration: 0.8,
-                ease: [0.16, 1, 0.3, 1],
-                delay: idx * 0.1,
+      {/* Full-screen project panels */}
+      {PROJECTS.map((project, idx) => (
+        <ZoomCard key={project.id}>
+          {/* Inner panel fills the sticky wrapper */}
+          <div
+            style={{
+              height: "100%",
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              background: "var(--surface)",
+              borderTop: "1px solid var(--border)",
+            }}
+            className="project-fullscreen-grid"
+          >
+            {/* Visual side */}
+            <div
+              style={{
+                order: idx % 2 === 0 ? 1 : 2,
+                overflow: "hidden",
+                height: "100%",
               }}
-              whileHover={{ scale: 1.01, y: -4 }}
             >
+              <ProjectVisual project={project} />
+            </div>
+
+            {/* Content side */}
+            <div
+              style={{
+                order: idx % 2 === 0 ? 2 : 1,
+                padding: "clamp(1rem, 3vh, 2.5rem) clamp(1.5rem, 5vw, 3.5rem)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: "clamp(0.6rem, 2vh, 1rem)",
+                height: "100%",
+              }}
+            >
+              {/* Project number */}
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: idx % 2 === 0 ? "55% 1fr" : "1fr 55%",
+                  fontSize: "clamp(3rem, 6vh, 5rem)",
+                  fontWeight: 800,
+                  lineHeight: 1,
+                  color: "var(--border)",
+                  letterSpacing: "-0.05em",
+                  userSelect: "none",
                 }}
-                className="project-featured-grid"
               >
-                {/* Visual side */}
-                <div style={{ order: idx % 2 === 0 ? 1 : 2, overflow: "hidden" }}>
-                  <ProjectVisual project={project} />
-                </div>
-
-                {/* Content side */}
-                <div
-                  style={{
-                    order: idx % 2 === 0 ? 2 : 1,
-                    padding: "2.5rem",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    gap: "1.25rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "var(--text-muted)",
-                      fontWeight: 500,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {project.category}
-                  </div>
-
-                  <h3 className="text-title">{project.title}</h3>
-
-                  <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", lineHeight: 1.7 }}>
-                    {project.description}
-                  </p>
-
-                  {/* Highlights */}
-                  <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.4rem" }}>
-                    {project.highlights.map((h) => (
-                      <li
-                        key={h}
-                        style={{
-                          fontSize: "0.825rem",
-                          color: "var(--text-secondary)",
-                          display: "flex",
-                          alignItems: "flex-start",
-                          gap: "0.5rem",
-                          lineHeight: 1.55,
-                        }}
-                      >
-                        <span
-                          style={{
-                            color: project.accentColor,
-                            fontSize: "0.55rem",
-                            marginTop: "5px",
-                            flexShrink: 0,
-                          }}
-                        >
-                          ●
-                        </span>
-                        {h}
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* Metrics */}
-                  <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
-                    {project.metrics.map((m) => (
-                      <div
-                        key={m}
-                        style={{
-                          padding: "0.3rem 0.7rem",
-                          background: "var(--bg)",
-                          border: "1px solid var(--border)",
-                          borderRadius: "100px",
-                          fontSize: "0.72rem",
-                          fontWeight: 500,
-                          color: "var(--text-secondary)",
-                        }}
-                      >
-                        {m}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Tags */}
-                  <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
-                    {project.tags.map((tag) => (
-                      <span key={tag} className="project-tag">{tag}</span>
-                    ))}
-                  </div>
-
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-secondary"
-                    style={{
-                      alignSelf: "flex-start",
-                      marginTop: "0.25rem",
-                      fontSize: "0.85rem",
-                      padding: "0.625rem 1.25rem",
-                    }}
-                  >
-                    View on GitHub →
-                  </a>
-                </div>
+                0{idx + 1}
               </div>
-            </motion.div>
-          ))}
-        </div>
 
-        {/* GitHub CTA */}
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  color: "var(--text-muted)",
+                  fontWeight: 500,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {project.category}
+              </div>
+
+              <h3
+                style={{
+                  fontSize: "clamp(1.25rem, 3vh, 2rem)",
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1.15,
+                  color: "var(--text-primary)",
+                }}
+              >
+                {project.title}
+              </h3>
+
+              <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", lineHeight: 1.6, maxWidth: "500px" }}>
+                {project.description}
+              </p>
+
+              {/* Highlights */}
+              <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                {project.highlights.map((h) => (
+                  <li
+                    key={h}
+                    style={{
+                      fontSize: "0.82rem",
+                      color: "var(--text-secondary)",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "0.6rem",
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: project.accentColor,
+                        fontSize: "0.55rem",
+                        marginTop: "5px",
+                        flexShrink: 0,
+                      }}
+                    >
+                      ●
+                    </span>
+                    {h}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Tags */}
+              <div style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap" }}>
+                {project.tags.map((tag) => (
+                  <span key={tag} className="project-tag" style={{ fontSize: "0.7rem", padding: "0.2rem 0.5rem" }}>{tag}</span>
+                ))}
+              </div>
+
+              {/* Metrics */}
+              <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
+                {project.metrics.map((m) => (
+                  <div
+                    key={m}
+                    style={{
+                      padding: "0.25rem 0.6rem",
+                      background: "var(--bg)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "100px",
+                      fontSize: "0.68rem",
+                      fontWeight: 500,
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    {m}
+                  </div>
+                ))}
+              </div>
+
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-secondary"
+                style={{
+                  alignSelf: "flex-start",
+                  fontSize: "0.82rem",
+                  padding: "0.5rem 1.25rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+                View on GitHub
+              </a>
+            </div>
+          </div>
+        </ZoomCard>
+      ))}
+
+      {/* GitHub CTA */}
+      <div className="container" style={{ paddingBottom: "var(--section-padding)" }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -398,3 +542,4 @@ export function ProjectsSection() {
     </section>
   );
 }
+

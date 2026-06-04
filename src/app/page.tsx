@@ -9,6 +9,7 @@ import { ProjectsSection } from "@/components/ProjectsSection";
 import { ExperienceSection } from "@/components/ExperienceSection";
 import { ContactSection } from "@/components/ContactSection";
 import { Footer } from "@/components/Footer";
+import { SectionReveal } from "@/components/SectionReveal";
 
 export default function Home() {
   return (
@@ -20,15 +21,33 @@ export default function Home() {
 
       {/* Main content */}
       <main id="main-content">
+        {/* Hero — has its own entrance animations */}
         <HeroSection />
-        <AboutSection />
-        <SkillsSection />
-        <ProjectsSection />
-        <ExperienceSection />
-        <ContactSection />
+
+        <SectionReveal delay={0}>
+          <AboutSection />
+        </SectionReveal>
+
+        <SectionReveal delay={0.05} direction="up">
+          <SkillsSection />
+        </SectionReveal>
+
+        <SectionReveal delay={0.05} direction="up">
+          <ProjectsSection />
+        </SectionReveal>
+
+        <SectionReveal delay={0.05} direction="up">
+          <ExperienceSection />
+        </SectionReveal>
+
+        <SectionReveal delay={0.05} direction="up">
+          <ContactSection />
+        </SectionReveal>
       </main>
 
-      <Footer />
+      <SectionReveal delay={0} direction="fade">
+        <Footer />
+      </SectionReveal>
     </SmoothScrollProvider>
   );
 }

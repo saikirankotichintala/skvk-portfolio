@@ -189,6 +189,7 @@ export function ContactSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.name}
+                  className="social-icon-btn"
                   style={{
                     width: "44px",
                     height: "44px",
@@ -204,17 +205,17 @@ export function ContactSection() {
                   }}
                   onMouseEnter={(e) => {
                     const el = e.currentTarget as HTMLAnchorElement;
-                    el.style.background = "var(--text-primary)";
+                    el.style.background = "var(--accent)";
                     el.style.color = "white";
                     el.style.transform = "translateY(-2px)";
                     el.style.borderColor = "transparent";
                   }}
                   onMouseLeave={(e) => {
                     const el = e.currentTarget as HTMLAnchorElement;
-                    el.style.background = "var(--bg)";
-                    el.style.color = "var(--text-secondary)";
-                    el.style.transform = "translateY(0)";
-                    el.style.borderColor = "var(--border)";
+                    el.style.background = "";
+                    el.style.color = "";
+                    el.style.transform = "";
+                    el.style.borderColor = "";
                   }}
                 >
                   {social.icon}

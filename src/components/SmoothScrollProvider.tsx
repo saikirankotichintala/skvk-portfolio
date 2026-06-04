@@ -1,42 +1,30 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import Lenis from "lenis";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect } from "react";
 
-gsap.registerPlugin(ScrollTrigger);
-
+/**
+ * Registers GSAP ScrollTrigger on mount.
+ * Smooth scrolling is handled natively via `html { scroll-behavior: smooth }`.
+ * All GSAP imports are dynamic (inside useEffect) to avoid SSR module errors.
+ */
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
-  const lenisRef = useRef<Lenis | null>(null);
-
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: true,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-    });
+    let cleanupFns: Array<() => void> = [];
 
-    lenisRef.current = lenis;
-
-    // Sync Lenis with GSAP ticker
-    const onTick = (time: number) => {
-      lenis.raf(time * 1000);
-    };
-
-    gsap.ticker.add(onTick);
-    gsap.ticker.lagSmoothing(0);
-
-    // Update ScrollTrigger on Lenis scroll
-    lenis.on("scroll", ScrollTrigger.update);
+    Promise.all([
+      import("gsap").then((m) => m.default),
+      import("gsap/ScrollTrigger").then((m) => m.ScrollTrigger),
+    ])
+      .then(([gsap, ScrollTrigger]) => {
+        gsap.registerPlugin(ScrollTrigger);
+        cleanupFns.push(() => ScrollTrigger.getAll().forEach((t) => t.kill()));
+      })
+      .catch(() => {
+        // Graceful degradation — animations still work, just without ScrollTrigger
+      });
 
     return () => {
-      lenis.destroy();
-      gsap.ticker.remove(onTick);
+      cleanupFns.forEach((fn) => fn());
     };
   }, []);
 
