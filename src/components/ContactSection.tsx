@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, HTMLMotionProps } from "framer-motion";
 
 const SOCIAL_LINKS = [
   {
@@ -36,6 +36,194 @@ const SOCIAL_LINKS = [
   },
 ];
 
+const socialContainerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const socialItemVariants = {
+  hidden: { opacity: 0, scale: 0.3 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 260,
+      damping: 15,
+    },
+  },
+};
+
+const formVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const formFieldVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
+function MagneticButton({ children, style, ...props }: HTMLMotionProps<"button">) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const { clientX, clientY } = e;
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+    const x = (clientX - centerX) * 0.25; // 25% magnetic force
+    const y = (clientY - centerY) * 0.25;
+    setPosition({ x, y });
+  };
+
+  const handleMouseLeave = () => {
+    setPosition({ x: 0, y: 0 });
+  };
+
+  return (
+    <motion.button
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      animate={{ x: position.x, y: position.y }}
+      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+      style={{
+        ...style,
+        position: "relative",
+      }}
+      {...props}
+    >
+      {children}
+    </motion.button>
+  );
+}
+
+/* ── Interactive Particle Field ───────────────────────────── */
+function ParticleField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouse = useRef({ x: -9999, y: -9999 });
+  const rafRef = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+
+    const resize = () => {
+      canvas.width  = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    /* Particles */
+    const N = 80;
+    const particles = Array.from({ length: N }, () => ({
+      x:  Math.random() * canvas.width,
+      y:  Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r:  1 + Math.random() * 2,
+      brightness: 0.3 + Math.random() * 0.5,
+    }));
+
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    };
+    canvas.addEventListener("mousemove", onMouseMove);
+    canvas.addEventListener("mouseleave", () => { mouse.current = { x: -9999, y: -9999 }; });
+
+    function tick() {
+      rafRef.current = requestAnimationFrame(tick);
+      ctx.clearRect(0, 0, canvas!.width, canvas!.height);
+
+      /* Update + draw */
+      for (const p of particles) {
+        /* Mouse repulsion */
+        const dx = p.x - mouse.current.x;
+        const dy = p.y - mouse.current.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 100) {
+          const force = (100 - dist) / 100 * 0.6;
+          p.vx += (dx / dist) * force;
+          p.vy += (dy / dist) * force;
+        }
+
+        /* Damping */
+        p.vx *= 0.97;
+        p.vy *= 0.97;
+
+        /* Move + wrap */
+        p.x = (p.x + p.vx + canvas!.width)  % canvas!.width;
+        p.y = (p.y + p.vy + canvas!.height) % canvas!.height;
+
+        /* Draw particle */
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,140,0,${p.brightness})`;
+        ctx.fill();
+      }
+
+      /* Connections */
+      const CONNECT_DIST = 90;
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const d  = Math.sqrt(dx * dx + dy * dy);
+          if (d < CONNECT_DIST) {
+            const alpha = (1 - d / CONNECT_DIST) * 0.25;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(255,140,0,${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+    tick();
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      canvas.removeEventListener("mousemove", onMouseMove);
+      cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      style={{
+        position: "absolute", inset: 0,
+        width: "100%", height: "100%",
+        zIndex: 0, pointerEvents: "auto",
+      }}
+    />
+  );
+}
+
 export function ContactSection() {
   const [formState, setFormState] = useState({
     name: "",
@@ -55,10 +243,13 @@ export function ContactSection() {
     <section
       id="contact"
       className="section"
-      style={{ background: "var(--surface)" }}
+      style={{ background: "var(--surface)", position: "relative", overflow: "hidden" }}
       aria-label="Contact"
     >
-      <div className="container">
+      {/* Mouse-reactive particle field canvas */}
+      <ParticleField />
+
+      <div className="container" style={{ position: "relative", zIndex: 1 }}>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -176,15 +367,16 @@ export function ContactSection() {
 
             {/* Social Links */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              variants={socialContainerVariants}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, delay: 0.2 }}
               style={{ display: "flex", gap: "0.75rem" }}
             >
               {SOCIAL_LINKS.map((social) => (
-                <a
+                <motion.a
                   key={social.name}
+                  variants={socialItemVariants}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -219,7 +411,7 @@ export function ContactSection() {
                   }}
                 >
                   {social.icon}
-                </a>
+                </motion.a>
               ))}
             </motion.div>
           </div>
@@ -252,8 +444,12 @@ export function ContactSection() {
                 </p>
               </motion.div>
             ) : (
-              <form
+              <motion.form
                 onSubmit={handleSubmit}
+                variants={formVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
                 style={{
                   background: "var(--bg)",
                   border: "1px solid var(--border)",
@@ -265,7 +461,7 @@ export function ContactSection() {
                 }}
                 noValidate
               >
-                <div>
+                <motion.div variants={formFieldVariants}>
                   <label
                     htmlFor="contact-name"
                     style={{ fontSize: "0.8rem", fontWeight: 500, color: "var(--text-secondary)", display: "block", marginBottom: "0.5rem" }}
@@ -281,9 +477,9 @@ export function ContactSection() {
                     onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                     required
                   />
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div variants={formFieldVariants}>
                   <label
                     htmlFor="contact-email"
                     style={{ fontSize: "0.8rem", fontWeight: 500, color: "var(--text-secondary)", display: "block", marginBottom: "0.5rem" }}
@@ -299,9 +495,9 @@ export function ContactSection() {
                     onChange={(e) => setFormState({ ...formState, email: e.target.value })}
                     required
                   />
-                </div>
+                </motion.div>
 
-                <div>
+                <motion.div variants={formFieldVariants}>
                   <label
                     htmlFor="contact-message"
                     style={{ fontSize: "0.8rem", fontWeight: 500, color: "var(--text-secondary)", display: "block", marginBottom: "0.5rem" }}
@@ -318,33 +514,35 @@ export function ContactSection() {
                     required
                     style={{ resize: "vertical", minHeight: "120px" }}
                   />
-                </div>
+                </motion.div>
 
-                <button
-                  type="submit"
-                  className="btn-primary"
-                  style={{ justifyContent: "center" }}
-                >
-                  Send message
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                <motion.div variants={formFieldVariants}>
+                  <MagneticButton
+                    type="submit"
+                    className="btn-primary"
+                    style={{ justifyContent: "center", width: "100%" }}
                   >
-                    <line x1="3" y1="8" x2="13" y2="8" />
-                    <polyline points="9,4 13,8 9,12" />
-                  </svg>
-                </button>
+                    Send message
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="3" y1="8" x2="13" y2="8" />
+                      <polyline points="9,4 13,8 9,12" />
+                    </svg>
+                  </MagneticButton>
+                </motion.div>
 
-                <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center" }}>
+                <motion.p variants={formFieldVariants} style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center" }}>
                   No spam ever. I respond within 24 hours.
-                </p>
-              </form>
+                </motion.p>
+              </motion.form>
             )}
           </motion.div>
         </div>

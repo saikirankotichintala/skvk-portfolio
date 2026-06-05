@@ -40,6 +40,109 @@ function CountUp({ target, suffix = "", prefix = "", duration = 2000 }: CountUpP
   );
 }
 
+/* ── Floating Python Terminal ────────────────────────────── */
+const TERMINAL_LINES = [
+  { txt: "import pandas as pd",            delay: 0.0, color: "#f5f0e8" },
+  { txt: "import sklearn.model_selection", delay: 0.4, color: "#f5f0e8" },
+  { txt: "",                               delay: 0.7, color: "" },
+  { txt: "df = pd.read_csv('flights.csv')", delay: 0.9, color: "#c8b89a" },
+  { txt: "X, y = df.drop('price', axis=1), df['price']", delay: 1.3, color: "#c8b89a" },
+  { txt: "",                               delay: 1.7, color: "" },
+  { txt: "model = RandomForestRegressor()",  delay: 2.0, color: "#ffd000" },
+  { txt: "model.fit(X_train, y_train)",       delay: 2.5, color: "#ffd000" },
+  { txt: "",                               delay: 2.9, color: "" },
+  { txt: "# Accuracy: 93.5%  ✓",           delay: 3.2, color: "#22c55e" },
+];
+
+function TerminalLine({ txt, delay, color }: { txt: string; delay: number; color: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const [visible, setVisible] = useState(false);
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    if (!inView || visible) return;
+    const timer = setTimeout(() => {
+      setVisible(true);
+      let i = 0;
+      const interval = setInterval(() => {
+        setText(txt.slice(0, i + 1));
+        i++;
+        if (i >= txt.length) clearInterval(interval);
+      }, 28);
+    }, delay * 1000);
+    return () => clearTimeout(timer);
+  }, [inView, txt, delay, visible]);
+
+  return (
+    <div ref={ref} style={{ minHeight: "1.4em", fontFamily: "monospace", fontSize: "0.72rem", color: color || "transparent", whiteSpace: "pre" }}>
+      {txt === "" ? "\u200B" : (visible ? text : "")}
+      {visible && text.length < txt.length && (
+        <span style={{ borderRight: "1px solid #ff8c00", animation: "blink 1s step-end infinite", marginLeft: "1px" }} />
+      )}
+    </div>
+  );
+}
+
+function TerminalWidget() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30, scale: 0.92 }}
+      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+      style={{
+        marginTop: "2rem",
+        background: "rgba(10,10,10,0.96)",
+        border: "1px solid rgba(255,140,0,0.2)",
+        borderRadius: "14px",
+        overflow: "hidden",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,140,0,0.05)",
+      }}
+    >
+      {/* Terminal bar */}
+      <div style={{
+        display: "flex", alignItems: "center", gap: "0.4rem",
+        padding: "0.6rem 0.875rem",
+        background: "rgba(255,255,255,0.04)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+      }}>
+        {["#ff5f57", "#ffbd2e", "#28c840"].map((c, i) => (
+          <div key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: c, opacity: 0.8 }} />
+        ))}
+        <span style={{ flex: 1, fontSize: "0.65rem", textAlign: "center", color: "rgba(255,255,255,0.25)", fontFamily: "monospace" }}>
+          ml_pipeline.py
+        </span>
+      </div>
+
+      {/* Code lines */}
+      <div style={{ padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: "0.15rem" }}>
+        {TERMINAL_LINES.map((line, i) => (
+          <div key={i} style={{ display: "flex", gap: "0.6rem" }}>
+            <span style={{ color: "rgba(255,255,255,0.12)", fontFamily: "monospace", fontSize: "0.72rem", minWidth: "1.2em", userSelect: "none" }}>
+              {line.txt ? i + 1 : ""}
+            </span>
+            <TerminalLine txt={line.txt} delay={line.delay} color={line.color} />
+          </div>
+        ))}
+      </div>
+
+      {/* Blinking cursor line at bottom */}
+      <div style={{ padding: "0.25rem 1.25rem 0.75rem", display: "flex", gap: "0.4rem", alignItems: "center" }}>
+        <span style={{ color: "#ff8c00", fontFamily: "monospace", fontSize: "0.72rem" }}>❯</span>
+        <motion.span
+          animate={{ opacity: [1, 0, 1] }}
+          transition={{ duration: 1, repeat: Infinity }}
+          style={{ display: "inline-block", width: 7, height: 14, background: "#ff8c00", borderRadius: 2 }}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
 const STATS = [
   {
     value: 8,
@@ -87,10 +190,10 @@ export function AboutSection() {
       <div className="container">
         {/* Section label */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: -80 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
           <span className="section-label">About</span>
         </motion.div>
@@ -121,52 +224,117 @@ export function AboutSection() {
 
             <motion.p
               className="text-body-lg"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+              transition={{ staggerChildren: 0.12 }}
               style={{ marginBottom: "1.5rem" }}
             >
-              I&apos;m a result-driven B.Tech student in{" "}
-              <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-                Computer Science (AI &amp; Data Science)
-              </strong>{" "}
-              at Ramdeobaba University, Nagpur, with hands-on experience in data engineering,
-              statistical analysis, and machine learning.
+              <motion.span
+                variants={{
+                  hidden: { opacity: 0, y: 15, filter: "blur(3px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6 } }
+                }}
+                style={{ display: "inline-block" }}
+              >
+                I&apos;m a result-driven B.Tech student in{" "}
+                <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+                  Computer Science (AI &amp; Data Science)
+                </strong>{" "}
+              </motion.span>{" "}
+              <motion.span
+                variants={{
+                  hidden: { opacity: 0, y: 15, filter: "blur(3px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6 } }
+                }}
+                style={{ display: "inline-block" }}
+              >
+                at Ramdeobaba University, Nagpur, with hands-on experience in data engineering,
+              </motion.span>{" "}
+              <motion.span
+                variants={{
+                  hidden: { opacity: 0, y: 15, filter: "blur(3px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6 } }
+                }}
+                style={{ display: "inline-block" }}
+              >
+                statistical analysis, and machine learning.
+              </motion.span>
             </motion.p>
 
             <motion.p
               className="text-body-lg"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              transition={{ staggerChildren: 0.12, delayChildren: 0.15 }}
               style={{ marginBottom: "1.5rem" }}
             >
-              I&apos;m proficient in executing end-to-end{" "}
-              <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-                data pipelines
-              </strong>
-              , performing complex EDA, and building predictive models using{" "}
-              <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-                Python, SQL, Pandas, and Scikit-learn
-              </strong>
-              and practical experience developing data-driven software solutions for an NGO initiative.
+              <motion.span
+                variants={{
+                  hidden: { opacity: 0, y: 15, filter: "blur(3px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6 } }
+                }}
+                style={{ display: "inline-block" }}
+              >
+                I&apos;m proficient in executing end-to-end{" "}
+                <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+                  data pipelines
+                </strong>
+                , performing complex EDA,
+              </motion.span>{" "}
+              <motion.span
+                variants={{
+                  hidden: { opacity: 0, y: 15, filter: "blur(3px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6 } }
+                }}
+                style={{ display: "inline-block" }}
+              >
+                and building predictive models using{" "}
+                <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+                  Python, SQL, Pandas, and Scikit-learn
+                </strong>{" "}
+              </motion.span>{" "}
+              <motion.span
+                variants={{
+                  hidden: { opacity: 0, y: 15, filter: "blur(3px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6 } }
+                }}
+                style={{ display: "inline-block" }}
+              >
+                and practical experience developing data-driven software solutions for an NGO initiative.
+              </motion.span>
             </motion.p>
 
             <motion.p
               className="text-body-lg"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial="hidden"
+              whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
+              transition={{ staggerChildren: 0.12, delayChildren: 0.25 }}
               style={{ marginBottom: "2.5rem" }}
             >
-              I excel at transforming raw datasets into{" "}
-              <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-                actionable insights and structured visualizations
-              </strong>{" "}
-              to drive strategic decision-making.
+              <motion.span
+                variants={{
+                  hidden: { opacity: 0, y: 15, filter: "blur(3px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6 } }
+                }}
+                style={{ display: "inline-block" }}
+              >
+                I excel at transforming raw datasets into{" "}
+                <strong style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+                  actionable insights and structured visualizations
+                </strong>{" "}
+              </motion.span>{" "}
+              <motion.span
+                variants={{
+                  hidden: { opacity: 0, y: 15, filter: "blur(3px)" },
+                  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6 } }
+                }}
+                style={{ display: "inline-block" }}
+              >
+                to drive strategic decision-making.
+              </motion.span>
             </motion.p>
 
             <motion.a
@@ -210,6 +378,8 @@ export function AboutSection() {
             {/* Real photo card */}
             <PhotoCard />
 
+            {/* Animated Python terminal */}
+            <TerminalWidget />
 
             {/* Floating badge — AI */}
             <motion.div

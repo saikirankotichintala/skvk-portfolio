@@ -1,8 +1,23 @@
 "use client";
 
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+
 export function SkillsBackground() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Slow vertical parallax translations
+  const videoY = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+  const patternY = useTransform(scrollYProgress, [0, 1], [-80, 80]);
+
   return (
     <div
+      ref={containerRef}
       style={{
         position: "absolute",
         inset: 0,
@@ -13,23 +28,32 @@ export function SkillsBackground() {
         pointerEvents: "none",
       }}
     >
-      {/* Video layer */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
+      {/* Video layer with parallax */}
+      <motion.div
         style={{
           position: "absolute",
-          inset: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          objectPosition: "center",
+          top: "-50px",
+          bottom: "-50px",
+          left: 0,
+          right: 0,
+          y: videoY,
         }}
       >
-        <source src="/skill.mp4" type="video/mp4" />
-      </video>
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+          }}
+        >
+          <source src="/skill.mp4" type="video/mp4" />
+        </video>
+      </motion.div>
 
       {/* Dark overlay — deep navy gradient for readability */}
       <div
@@ -41,14 +65,18 @@ export function SkillsBackground() {
         }}
       />
 
-      {/* Subtle dot-grid texture */}
-      <div
+      {/* Subtle dot-grid texture with its own parallax factor */}
+      <motion.div
         style={{
           position: "absolute",
-          inset: 0,
+          top: "-80px",
+          bottom: "-80px",
+          left: 0,
+          right: 0,
           backgroundImage:
             "radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px)",
           backgroundSize: "32px 32px",
+          y: patternY,
         }}
       />
 

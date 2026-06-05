@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import { SkillsBackground } from "./SkillsBackground";
 
 /* ── Accurate brand SVG icons (Simple Icons paths) ───────── */
@@ -322,6 +322,158 @@ const cardVariants = {
   visible: { opacity: 1, y: 0,  scale: 1, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
 };
 
+/* ── Skill Radar Chart ────────────────────────────────────── */
+const RADAR_AXES = [
+  { label: "Python / ML", value: 0.93 },
+  { label: "Data Eng.",   value: 0.82 },
+  { label: "Full-Stack",  value: 0.75 },
+  { label: "SQL / DB",    value: 0.80 },
+  { label: "Cloud",       value: 0.65 },
+  { label: "AI/LLM",      value: 0.70 },
+];
+
+function polarToXY(angle: number, r: number, cx: number, cy: number) {
+  const rad = (angle - 90) * (Math.PI / 180);
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function SkillRadarChart() {
+  const ref = useRef<SVGSVGElement>(null);
+  const inView = useInView(ref as React.RefObject<Element>, { once: true, margin: "-80px" });
+  const SIZE = 260;
+  const CX = SIZE / 2, CY = SIZE / 2;
+  const R = 100;
+  const N = RADAR_AXES.length;
+  const step = 360 / N;
+
+  /* Concentric rings */
+  const rings = [0.25, 0.5, 0.75, 1.0].map((scale) => {
+    const pts = Array.from({ length: N }, (_, i) => {
+      const p = polarToXY(i * step, R * scale, CX, CY);
+      return `${p.x},${p.y}`;
+    }).join(" ");
+    return pts;
+  });
+
+  /* Data polygon */
+  const dataPts = RADAR_AXES.map((ax, i) => {
+    const p = polarToXY(i * step, R * ax.value, CX, CY);
+    return `${p.x},${p.y}`;
+  }).join(" ");
+
+  /* Axis endpoints + label positions */
+  const axes = RADAR_AXES.map((ax, i) => ({
+    ...ax,
+    end: polarToXY(i * step, R, CX, CY),
+    labelPos: polarToXY(i * step, R + 22, CX, CY),
+    dataPt: polarToXY(i * step, R * ax.value, CX, CY),
+  }));
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.85 }}
+      animate={inView ? { opacity: 1, scale: 1 } : {}}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "2rem 1rem",
+        background: "rgba(255,255,255,0.03)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        borderRadius: "24px",
+        marginTop: "3rem",
+      }}
+    >
+      <div style={{ fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)", marginBottom: "1.5rem" }}>
+        Proficiency Radar
+      </div>
+
+      <svg ref={ref} width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} style={{ overflow: "visible" }}>
+        {/* Grid rings */}
+        {rings.map((pts, ri) => (
+          <polygon key={ri} points={pts} fill="none"
+            stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+        ))}
+
+        {/* Axis spokes */}
+        {axes.map((ax, i) => (
+          <line key={i} x1={CX} y1={CY} x2={ax.end.x} y2={ax.end.y}
+            stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        ))}
+
+        {/* Data shape — draws in on view */}
+        <motion.polygon
+          points={dataPts}
+          fill="rgba(255,140,0,0.12)"
+          stroke="#ff8c00"
+          strokeWidth="2"
+          strokeLinejoin="round"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={inView ? { pathLength: 1, opacity: 1 } : {}}
+          transition={{ duration: 1.5, ease: "easeOut", delay: 0.4 }}
+        />
+
+        {/* Data points */}
+        {axes.map((ax, i) => (
+          <motion.circle
+            key={i}
+            cx={ax.dataPt.x}
+            cy={ax.dataPt.y}
+            r={4}
+            fill="#ff8c00"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={inView ? { scale: 1, opacity: 1 } : {}}
+            transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.6 + i * 0.08 }}
+            style={{ transformOrigin: `${ax.dataPt.x}px ${ax.dataPt.y}px`, transformBox: "fill-box" }}
+          />
+        ))}
+
+        {/* Pulsing rings on data points */}
+        {axes.map((ax, i) => (
+          <motion.circle
+            key={`pulse-${i}`}
+            cx={ax.dataPt.x}
+            cy={ax.dataPt.y}
+            r={4}
+            fill="none"
+            stroke="#ff8c00"
+            strokeWidth="1"
+            animate={inView ? { r: [4, 10, 4], opacity: [0.8, 0, 0.8] } : {}}
+            transition={{ duration: 2.5, delay: 1 + i * 0.15, repeat: Infinity, ease: "easeOut" }}
+          />
+        ))}
+
+        {/* Axis labels */}
+        {axes.map((ax, i) => (
+          <text
+            key={`label-${i}`}
+            x={ax.labelPos.x}
+            y={ax.labelPos.y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontSize="9"
+            fill="rgba(255,255,255,0.55)"
+            fontFamily="Inter, sans-serif"
+          >
+            {ax.label}
+          </text>
+        ))}
+      </svg>
+
+      {/* Legend */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginTop: "1.25rem", justifyContent: "center" }}>
+        {RADAR_AXES.map((ax) => (
+          <div key={ax.label} style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "0.7rem", color: "rgba(255,255,255,0.45)" }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#ff8c00", opacity: ax.value }} />
+            {ax.label} — {Math.round(ax.value * 100)}%
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 export function SkillsSection() {
   const [activeCategory, setActiveCategory] = useState("ai-ml");
   const active = SKILL_CATEGORIES.find((c) => c.id === activeCategory)!;
@@ -431,13 +583,29 @@ export function SkillsSection() {
               gap: "1rem",
             }}
           >
-            {active.skills.map((skill) => {
+            {active.skills.map((skill, index) => {
               const ic = ICONS[skill.name];
+              const fromLeft = index % 2 === 0;
+              const cardEntranceVariants = {
+                hidden: { opacity: 0, x: fromLeft ? -45 : 45, y: 15, scale: 0.95 },
+                visible: {
+                  opacity: 1,
+                  x: 0,
+                  y: 0,
+                  scale: 1,
+                  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] }
+                }
+              };
               return (
                 <motion.div
                   key={skill.name}
-                  variants={cardVariants}
-                  whileHover={{ scale: 1.04, y: -5 }}
+                  variants={cardEntranceVariants}
+                  whileHover={{
+                    scale: 1.04,
+                    y: -5,
+                    borderColor: ic?.color ?? "rgba(255, 140, 0, 0.4)",
+                    boxShadow: `0 12px 32px rgba(0,0,0,0.3), 0 0 16px ${ic?.color ?? "rgba(255,140,0,0.2)"}`
+                  }}
                   transition={{ type: "spring", stiffness: 320, damping: 22 }}
                   style={{
                     borderRadius: "24px",
@@ -477,9 +645,34 @@ export function SkillsSection() {
                       color: "rgba(255, 255, 255, 0.90)",
                       letterSpacing: "-0.01em",
                       lineHeight: 1.3,
+                      marginBottom: "0.25rem",
                     }}
                   >
                     {skill.name}
+                  </div>
+
+                  {/* Progress bar container */}
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "4px",
+                      background: "rgba(255,255,255,0.06)",
+                      borderRadius: "100px",
+                      marginTop: "auto",
+                      overflow: "hidden"
+                    }}
+                  >
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${skill.pct}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                      style={{
+                        height: "100%",
+                        background: `linear-gradient(90deg, ${ic?.color ?? "#ff8c00"}, #ffd000)`,
+                        borderRadius: "100px"
+                      }}
+                    />
                   </div>
                 </motion.div>
               );
@@ -519,8 +712,12 @@ export function SkillsSection() {
 
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
             {CERTS.map((cert) => (
-              <div
+              <motion.div
                 key={cert.name}
+                initial={{ opacity: 0, rotateX: 65, y: 40 }}
+                whileInView={{ opacity: 1, rotateX: 0, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -530,10 +727,15 @@ export function SkillsSection() {
                   border: "1px solid rgba(255,255,255,0.10)",
                   borderRadius: "18px",
                   flex: "1 1 260px",
+                  transformOrigin: "bottom center",
                 }}
               >
                 {/* Icon — same size & style as skill icon bubbles */}
-                <div
+                <motion.div
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ type: "spring", stiffness: 280, damping: 15, delay: 0.25 }}
                   style={{
                     width: "48px",
                     height: "48px",
@@ -547,10 +749,15 @@ export function SkillsSection() {
                   }}
                 >
                   {cert.icon}
-                </div>
+                </motion.div>
 
                 {/* Text */}
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.15 }}
+                >
                   <div
                     style={{
                       fontSize: "0.875rem",
@@ -570,11 +777,14 @@ export function SkillsSection() {
                   >
                     {cert.sub}
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             ))}
           </div>
         </motion.div>
+
+        {/* Radar chart — proficiency overview */}
+        <SkillRadarChart />
 
       </div>
     </section>

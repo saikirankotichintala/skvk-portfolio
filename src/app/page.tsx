@@ -5,6 +5,7 @@ import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { AboutSection } from "@/components/AboutSection";
 import { SkillsSection } from "@/components/SkillsSection";
+import { InfiniteZoomSection } from "@/components/InfiniteZoomSection";
 import { ProjectsSection } from "@/components/ProjectsSection";
 import { ExperienceSection } from "@/components/ExperienceSection";
 import { ContactSection } from "@/components/ContactSection";
@@ -31,6 +32,9 @@ export default function Home() {
         <SectionReveal delay={0.05} direction="up">
           <SkillsSection />
         </SectionReveal>
+
+        {/* 3D Infinite Zoom — between Skills & Projects */}
+        <InfiniteZoomSection />
 
         <SectionReveal delay={0.05} direction="up">
           <ProjectsSection />

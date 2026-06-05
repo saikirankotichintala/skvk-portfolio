@@ -3,6 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 /* ── Typing animation hook ───────────────────────────────── */
 function useTypingAnimation(words: string[], loop = true) {
@@ -167,19 +172,74 @@ export function HeroSection() {
   }, []);
 
   useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
     const ctx = gsap.context(() => {
-      // Subtle parallax on the video as you scroll
+      const ST_BASE = {
+        trigger: heroRef.current,
+        start:   "top top",
+        end:     "bottom top",
+        scrub:   true,
+      };
+
+      /* Layer 1: Video bg — slowest, deepest */
       gsap.to(".hero-video-bg", {
-        yPercent: 15,
+        yPercent: 22,
         ease: "none",
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
+        scrollTrigger: ST_BASE,
+      });
+
+      /* Layer 2: Dark overlay — intensifies as hero leaves */
+      gsap.to(".hero-overlay", {
+        opacity: 0.95,
+        ease: "none",
+        scrollTrigger: ST_BASE,
+      });
+
+      /* Layer 3: Noise — drifts upward, fades */
+      gsap.to(".hero-noise", {
+        yPercent: -12,
+        opacity: 0.15,
+        ease: "none",
+        scrollTrigger: ST_BASE,
+      });
+
+      /* Layer 4: Grid — counter-moves, shrinks */
+      gsap.to(".hero-grid-layer", {
+        yPercent: -18,
+        opacity: 0,
+        scale: 1.08,
+        ease: "none",
+        scrollTrigger: ST_BASE,
+      });
+
+      /* Layer 5: Content — slides up + fades out */
+      gsap.to(".hero-content", {
+        yPercent: -20,
+        opacity: 0,
+        ease: "none",
+        scrollTrigger: ST_BASE,
+      });
+
+      /* Geo shapes — each drifts to its own corner */
+      gsap.to(".geo-shape-1", {
+        x: -80, y: -50, rotation: 55, opacity: 0,
+        ease: "none",
+        scrollTrigger: ST_BASE,
+      });
+      gsap.to(".geo-shape-2", {
+        x: 100, y: 80, rotation: -40, opacity: 0,
+        ease: "none",
+        scrollTrigger: ST_BASE,
+      });
+      gsap.to(".geo-shape-3", {
+        x: -40, y: 120, rotation: 30, opacity: 0,
+        ease: "none",
+        scrollTrigger: ST_BASE,
       });
     }, heroRef);
+
     return () => ctx.revert();
   }, []);
 
@@ -223,6 +283,7 @@ export function HeroSection() {
 
       {/* ── Dark overlay for text legibility ───────────────── */}
       <div
+        className="hero-overlay"
         style={{
           position: "absolute",
           inset: 0,
@@ -235,6 +296,7 @@ export function HeroSection() {
 
       {/* ── Noise texture overlay ─────────────────────────── */}
       <div
+        className="hero-noise"
         aria-hidden="true"
         style={{
           position: "absolute",
@@ -249,6 +311,7 @@ export function HeroSection() {
 
       {/* ── Grid pattern ─────────────────────────────────── */}
       <div
+        className="hero-grid-layer"
         aria-hidden="true"
         style={{
           position: "absolute",
@@ -264,13 +327,18 @@ export function HeroSection() {
         }}
       />
 
+      {/* ── Background Shapes ──────────────────────────────── */}
+      <div className="geo-shape geo-shape-1" style={{ zIndex: 0 }} />
+      <div className="geo-shape geo-shape-2" style={{ zIndex: 0 }} />
+      <div className="geo-shape geo-shape-3" style={{ zIndex: 0 }} />
+ 
       {/* ── Content ──────────────────────────────────────── */}
       <div
         className="container hero-content"
         style={{ zIndex: 10, paddingTop: "6rem", paddingBottom: "4rem" }}
       >
         <div style={{ maxWidth: "800px" }}>
-
+ 
           {/* Availability badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -295,7 +363,7 @@ export function HeroSection() {
               Open to opportunities &amp; collaborations
             </div>
           </motion.div>
-
+ 
           {/* Headline — line 1: letter reveal */}
           <div style={{ marginBottom: "0.2rem", overflow: "hidden" }}>
             <h1 className="text-display" style={{ color: c.heading1 }}>
@@ -312,7 +380,7 @@ export function HeroSection() {
               />
             </h1>
           </div>
-
+ 
           {/* Headline — line 2: typed word */}
           <div style={{ marginBottom: "0.2rem" }}>
             <h1
@@ -357,23 +425,23 @@ export function HeroSection() {
               </span>
             </h1>
           </div>
-
-          {/* Headline — line 3: word reveal */}
-          <div style={{ marginBottom: "2.25rem" }}>
+ 
+          {/* Headline — line 3: letter reveal */}
+          <div style={{ marginBottom: "2.25rem", overflow: "hidden" }}>
             <h1 className="text-display">
-              <WordReveal
+              <LetterReveal
                 text="solutions."
+                color={c.solutions}
                 delay={1.0}
-                style={{ color: c.solutions }}
               />
             </h1>
           </div>
-
+ 
           {/* Sub-headline */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.9, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
             style={{
               fontSize: "clamp(1rem, 1.5vw, 1.2rem)",
               lineHeight: 1.75,
@@ -395,16 +463,19 @@ export function HeroSection() {
             <strong style={{ color: c.subtextName, fontWeight: 600 }}>Ramdeobaba University</strong>
             , Nagpur.
           </motion.p>
-
+ 
           {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1.6, ease: [0.16, 1, 0.3, 1] }}
-            style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}
-          >
-            <a
+          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
+            <motion.a
               href="#projects"
+              initial={{ scale: 0.3, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+                delay: 1.6
+              }}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -437,9 +508,17 @@ export function HeroSection() {
                 <line x1="3" y1="8" x2="13" y2="8" />
                 <polyline points="9,4 13,8 9,12" />
               </svg>
-            </a>
-            <a
+            </motion.a>
+            <motion.a
               href="#contact"
+              initial={{ scale: 0.3, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 260,
+                damping: 20,
+                delay: 1.75
+              }}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -468,8 +547,8 @@ export function HeroSection() {
               }}
             >
               Get in touch
-            </a>
-          </motion.div>
+            </motion.a>
+          </div>
 
           {/* Metrics row */}
           <motion.div

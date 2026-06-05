@@ -77,8 +77,11 @@ function ExperienceEntry({ exp }: { exp: typeof EXPERIENCES[0] }) {
       style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "1.5rem" }}
     >
       {/* Logo */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "0.25rem" }}>
-        <div
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "0.25rem", position: "relative" }}>
+        <motion.div
+          initial={{ scale: 0, rotate: -45 }}
+          animate={inView ? { scale: 1, rotate: 0 } : {}}
+          transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
           style={{
             width: "48px",
             height: "48px",
@@ -90,9 +93,33 @@ function ExperienceEntry({ exp }: { exp: typeof EXPERIENCES[0] }) {
             fontSize: "1.35rem",
             flexShrink: 0,
             boxShadow: `0 4px 16px ${exp.color}40`,
+            zIndex: 2,
           }}
         >
           {exp.logo}
+        </motion.div>
+        {/* Timeline line connecting logo down */}
+        <div
+          style={{
+            flex: 1,
+            width: "2px",
+            background: `linear-gradient(to bottom, ${exp.color} 0%, rgba(255,255,255,0.05) 100%)`,
+            marginTop: "0.5rem",
+            position: "relative",
+            minHeight: "120px",
+          }}
+        >
+          <motion.div
+            initial={{ scaleY: 0 }}
+            animate={inView ? { scaleY: 1 } : {}}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: exp.color,
+              originY: 0,
+            }}
+          />
         </div>
       </div>
 
@@ -184,6 +211,110 @@ function ExperienceEntry({ exp }: { exp: typeof EXPERIENCES[0] }) {
   );
 }
 
+/* ── Git Commit Graph ──────────────────────────────────────── */
+const WEEKS = 26;
+const DAYS  = 7;
+
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return Math.abs(s) / 2147483648; };
+}
+
+function GitCommitGraph() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const rand = seededRandom(42);
+
+  // Generate commit data: 0-4 intensity
+  const grid: number[][] = Array.from({ length: WEEKS }, () =>
+    Array.from({ length: DAYS }, () => {
+      const r = rand();
+      return r < 0.35 ? 0 : r < 0.55 ? 1 : r < 0.72 ? 2 : r < 0.85 ? 3 : 4;
+    })
+  );
+
+  const intensityColor = (v: number) => {
+    if (v === 0) return "rgba(255,255,255,0.05)";
+    const shades = ["#ff8c0022", "#ff8c0055", "#ff8c00aa", "#ff8c00"];
+    return shades[v - 1];
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 30 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      style={{
+        padding: "1.75rem",
+        background: "var(--bg)",
+        border: "1px solid var(--border)",
+        borderRadius: "20px",
+        marginBottom: "4rem",
+        overflow: "hidden",
+      }}
+    >
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.25rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff8c00" strokeWidth="2">
+            <circle cx="12" cy="12" r="3" />
+            <line x1="12" y1="2" x2="12" y2="6" />
+            <line x1="12" y1="18" x2="12" y2="22" />
+            <line x1="4.22" y1="4.22" x2="7.05" y2="7.05" />
+            <line x1="16.95" y1="16.95" x2="19.78" y2="19.78" />
+          </svg>
+          <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text-primary)" }}>
+            Contribution Activity
+          </span>
+        </div>
+        <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>
+          Jan 2026 — Present
+        </div>
+      </div>
+
+      {/* Commit grid */}
+      <div style={{ display: "flex", gap: "3px", overflowX: "auto", paddingBottom: "0.25rem" }}>
+        {grid.map((week, wi) => (
+          <div key={wi} style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
+            {week.map((day, di) => (
+              <motion.div
+                key={di}
+                initial={{ opacity: 0, scale: 0.4 }}
+                animate={inView ? { opacity: 1, scale: 1 } : {}}
+                transition={{
+                  duration: 0.3,
+                  delay: (wi * DAYS + di) * 0.006,
+                  type: "spring", stiffness: 300, damping: 20,
+                }}
+                title={`${day} commits`}
+                style={{
+                  width: 13, height: 13,
+                  borderRadius: 3,
+                  background: intensityColor(day),
+                  cursor: "default",
+                }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Legend */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", marginTop: "1rem" }}>
+        <span style={{ fontSize: "0.65rem", color: "var(--text-muted)" }}>Less</span>
+        {[0, 1, 2, 3, 4].map((v) => (
+          <div key={v} style={{ width: 12, height: 12, borderRadius: 2, background: intensityColor(v) }} />
+        ))}
+        <span style={{ fontSize: "0.65rem", color: "var(--text-muted)" }}>More</span>
+        <span style={{ marginLeft: "auto", fontSize: "0.65rem", color: "var(--text-muted)" }}>
+          248 contributions in the last 6 months
+        </span>
+      </div>
+    </motion.div>
+  );
+}
+
 export function ExperienceSection() {
   return (
     <section id="experience" className="section" aria-label="Experience and education">
@@ -198,6 +329,9 @@ export function ExperienceSection() {
         >
           <span className="section-label">Experience</span>
         </motion.div>
+
+        {/* Git-style contribution graph */}
+        <GitCommitGraph />
 
         <div
           style={{
@@ -273,8 +407,8 @@ export function ExperienceSection() {
           {EDUCATION.map((edu, idx) => (
             <motion.div
               key={edu.institution}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: idx % 2 === 0 ? -40 : 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1], delay: idx * 0.08 }}
               style={{
@@ -289,7 +423,11 @@ export function ExperienceSection() {
               }}
               whileHover={{ borderColor: `${edu.color}40`, boxShadow: `0 4px 20px ${edu.color}10` }}
             >
-              <div
+              <motion.div
+                initial={{ scale: 0, rotate: -30 }}
+                whileInView={{ scale: 1, rotate: 0 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", stiffness: 200, damping: 15, delay: idx * 0.08 + 0.2 }}
                 style={{
                   width: "48px",
                   height: "48px",
@@ -304,7 +442,7 @@ export function ExperienceSection() {
                 }}
               >
                 {edu.icon}
-              </div>
+              </motion.div>
 
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "0.25rem" }}>
@@ -391,7 +529,11 @@ export function ExperienceSection() {
               }}
               whileHover={{ borderColor: `${ach.color}40`, boxShadow: `0 4px 20px ${ach.color}08` }}
             >
-              <div
+              <motion.div
+                initial={{ scale: 0, rotate: -45 }}
+                whileInView={{ scale: 1, rotate: 0 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", stiffness: 200, damping: 15, delay: idx * 0.1 + 0.2 }}
                 style={{
                   width: "48px",
                   height: "48px",
@@ -406,7 +548,7 @@ export function ExperienceSection() {
                 }}
               >
                 {ach.icon}
-              </div>
+              </motion.div>
               <div>
                 <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "0.375rem", letterSpacing: "-0.01em" }}>
                   {ach.title}

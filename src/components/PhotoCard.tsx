@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import Image from "next/image";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 
 /* ── Exact lerp + remap helpers from animation.md ─────────── */
 const lerp = (start: number, end: number, amount: number) =>
@@ -27,6 +27,14 @@ export function PhotoCard() {
 
   /* ── In-view for zoom-scroll entrance (animation.md zoom-scroll @keyframes) */
   const inView = useInView(wrapRef, { once: true, margin: "-80px" });
+
+  /* ── Parallax scroll progress ── */
+  const { scrollYProgress } = useScroll({
+    target: wrapRef,
+    offset: ["start end", "end start"]
+  });
+
+  const y = useTransform(scrollYProgress, [0, 1], [-20, 20]);
 
   useEffect(() => {
     const card = cardRef.current;
@@ -83,13 +91,14 @@ export function PhotoCard() {
     <motion.div
       ref={wrapRef}
       className="photo-card-wrap"
-      initial={{ opacity: 0, scale: 0.82, filter: "blur(24px)" }}
+      style={{ y }}
+      initial={{ opacity: 0, scale: 0.82, filter: "blur(24px)", clipPath: "circle(0% at 50% 50%)" }}
       animate={
         inView
-          ? { opacity: 1, scale: 1, filter: "blur(0px)" }
-          : { opacity: 0, scale: 0.82, filter: "blur(24px)" }
+          ? { opacity: 1, scale: 1, filter: "blur(0px)", clipPath: "circle(100% at 50% 50%)" }
+          : { opacity: 0, scale: 0.82, filter: "blur(24px)", clipPath: "circle(0% at 50% 50%)" }
       }
-      transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
     >
       <div
         ref={cardRef}
